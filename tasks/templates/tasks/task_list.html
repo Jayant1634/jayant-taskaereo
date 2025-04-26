@@ -31,17 +31,17 @@
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light"><i class="fas fa-calendar text-muted"></i></span>
                                     <input type="date" class="form-control" id="searchDate" name="search_date" placeholder="Select date..." value="{{ request.GET.search_date|default:'' }}">
-                                </div>
+                        </div>
                             </div>
                             <div class="col-lg-3 col-md-4 col-sm-6">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light"><i class="fas fa-sort text-muted"></i></span>
                                     <select class="form-select" id="sortByDate" name="sort_by_date">
-                                        <option value="">Sort by date...</option>
+                                <option value="">Sort by date...</option>
                                         <option value="true" {% if request.GET.sort_by_date == 'true' %}selected{% endif %}>Newest First</option>
                                         <option value="false" {% if request.GET.sort_by_date == 'false' %}selected{% endif %}>Oldest First</option>
-                                    </select>
-                                </div>
+                            </select>
+                        </div>
                             </div>
                             <div class="col-lg-3 col-md-12 col-sm-6 d-flex gap-2">
                                 <button type="button" id="applyFilters" class="btn btn-sm btn-primary flex-grow-1">
@@ -49,9 +49,9 @@
                                 </button>
                                 <button type="button" id="clearFilters" class="btn btn-sm btn-outline-secondary px-3">
                                     <i class="fas fa-times"></i>
-                                </button>
-                            </div>
+                            </button>
                         </div>
+                    </div>
                     </form>
                 </div>
             </div>
@@ -59,36 +59,36 @@
     </div>
 
     <div id="taskListContainer">
-        <div class="row" id="taskList">
+    <div class="row" id="taskList">
             <!-- Task list will be dynamically populated here -->
-            {% for task in tasks %}
-            <div class="col-md-6 col-lg-4 task-card mb-4">
-                <div class="card h-100 shadow-sm border-0 hover-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title text-truncate">{{ task.title }}</h5>
-                        <p class="card-text">{{ task.description }}</p>
-                        <div class="text-muted small mb-3">
-                            <i class="fas fa-clock me-1"></i> Created: {{ task.created_date|date:"M d, Y H:i" }}
-                        </div>
-                        <div class="d-flex justify-content-end gap-2 mt-auto">
-                            <button class="btn btn-sm btn-outline-primary edit-task" data-id="{{ task.id }}"
-                                    data-bs-toggle="modal" data-bs-target="#editTaskModal">
-                                <i class="fas fa-edit me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-task" data-id="{{ task.id }}">
-                                <i class="fas fa-trash me-1"></i> Delete
-                            </button>
-                        </div>
+        {% for task in tasks %}
+        <div class="col-md-6 col-lg-4 task-card mb-4">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ task.title }}</h5>
+                    <p class="card-text">{{ task.description }}</p>
+                    <div class="text-muted small mb-3">
+                        <i class="fas fa-clock me-1"></i> Created: {{ task.created_date|date:"M d, Y H:i" }}
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-auto">
+                        <button class="btn btn-sm btn-outline-primary edit-task" data-id="{{ task.id }}"
+                                data-bs-toggle="modal" data-bs-target="#editTaskModal">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-task" data-id="{{ task.id }}">
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </button>
                     </div>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info shadow-sm border-0">
-                    <i class="fas fa-info-circle me-2"></i>No tasks found. Create your first task by clicking the "Add New Task" button.
-                </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info shadow-sm border-0">
+                <i class="fas fa-info-circle me-2"></i>No tasks found. Create your first task by clicking the "Add New Task" button.
             </div>
-            {% endfor %}
+        </div>
+        {% endfor %}
         </div>
     </div>
 </div>
@@ -634,7 +634,7 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Helper function to escape HTML entities
     function escapeHtml(str) {
         if (!str) return "";
@@ -660,7 +660,7 @@ $(document).ready(function() {
             setTimeout(() => $errorMsg.fadeOut(500, function() { $(this).remove(); }), 3000);
             return false;
         }
-
+        
         // Show loading indicator in the button
         const $button = $(this);
         $button.prop('disabled', true)
@@ -673,7 +673,7 @@ $(document).ready(function() {
 
         // Disable form fields during submission
         $('#title, #description').prop('disabled', true);
-
+        
         // Show the loading indicator
         $('#loading-indicator').addClass('active');
         
