@@ -406,8 +406,9 @@ $(document).ready(function() {
         $.ajax({
             url: '/api/tasks/?' + params.toString(),
             type: 'GET',
-            success: function(tasks) {
-                renderTaskList(tasks);
+            success: function(response) {
+                console.log("API Response:", response); // Debug: log the response structure
+                renderTaskList(response);
                 
                 // Update browser URL to match the filters
                 if (params.toString()) {
@@ -433,8 +434,30 @@ $(document).ready(function() {
     }
     
     // Function to render task list
-    function renderTaskList(tasks) {
-        if (!tasks || tasks.length === 0) {
+    function renderTaskList(response) {
+        // Ensure we're working with an array of tasks
+        let taskArray = [];
+        
+        // Check what format the API response is in
+        if (Array.isArray(response)) {
+            // Direct array of tasks
+            taskArray = response;
+        } else if (response && typeof response === 'object') {
+            // DRF paginated response format
+            if (Array.isArray(response.results)) {
+                taskArray = response.results;
+            } else if (response.count !== undefined) {
+                // Empty results array in paginated response
+                taskArray = [];
+            } else {
+                // Treat the response itself as a single task or empty array
+                taskArray = Object.keys(response).length > 0 ? [response] : [];
+            }
+        }
+        
+        console.log("Task Array:", taskArray); // Debug: log the processed array
+        
+        if (!taskArray || taskArray.length === 0) {
             $('#taskList').html(`
                 <div class="col-12">
                     <div class="alert alert-info shadow-sm border-0">
@@ -447,7 +470,7 @@ $(document).ready(function() {
         
         let taskListHtml = '';
         
-        tasks.forEach(function(task) {
+        taskArray.forEach(function(task) {
             taskListHtml += `
                 <div class="col-md-6 col-lg-4 task-card mb-4">
                     <div class="card h-100 shadow-sm border-0 hover-shadow">
