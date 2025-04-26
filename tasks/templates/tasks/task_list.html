@@ -19,66 +19,77 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 search-bar">
                 <div class="card-body p-3">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Search by title...">
+                    <form id="searchForm">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" class="form-control" id="searchInput" name="search" placeholder="Search by title..." value="{{ request.GET.search|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light"><i class="fas fa-calendar text-muted"></i></span>
+                                    <input type="date" class="form-control" id="searchDate" name="search_date" placeholder="Select date..." value="{{ request.GET.search_date|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light"><i class="fas fa-sort text-muted"></i></span>
+                                    <select class="form-select" id="sortByDate" name="sort_by_date">
+                                        <option value="">Sort by date...</option>
+                                        <option value="true" {% if request.GET.sort_by_date == 'true' %}selected{% endif %}>Newest First</option>
+                                        <option value="false" {% if request.GET.sort_by_date == 'false' %}selected{% endif %}>Oldest First</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-12 col-sm-6 d-flex gap-2">
+                                <button type="button" id="applyFilters" class="btn btn-sm btn-primary flex-grow-1">
+                                    <i class="fas fa-filter me-2"></i>Apply Filters
+                                </button>
+                                <button type="button" id="clearFilters" class="btn btn-sm btn-outline-secondary px-3">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-calendar text-muted"></i></span>
-                                <input type="date" class="form-control border-start-0" id="searchDate">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="sortByDate">
-                                <option value="">Sort by date...</option>
-                                <option value="true">Newest First</option>
-                                <option value="false">Oldest First</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-outline-secondary w-100" id="clearFilters">
-                                <i class="fas fa-times me-2"></i>Clear
-                            </button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row" id="taskList">
-        {% for task in tasks %}
-        <div class="col-md-6 col-lg-4 task-card mb-4">
-            <div class="card h-100 shadow-sm border-0 hover-shadow">
-                <div class="card-body">
-                    <h5 class="card-title text-truncate">{{ task.title }}</h5>
-                    <p class="card-text">{{ task.description }}</p>
-                    <div class="text-muted small mb-3">
-                        <i class="fas fa-clock me-1"></i> Created: {{ task.created_date|date:"M d, Y H:i" }}
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-auto">
-                        <button class="btn btn-sm btn-outline-primary edit-task" data-id="{{ task.id }}"
-                                data-bs-toggle="modal" data-bs-target="#editTaskModal">
-                            <i class="fas fa-edit me-1"></i> Edit
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger delete-task" data-id="{{ task.id }}">
-                            <i class="fas fa-trash me-1"></i> Delete
-                        </button>
+    <div id="taskListContainer">
+        <div class="row" id="taskList">
+            <!-- Task list will be dynamically populated here -->
+            {% for task in tasks %}
+            <div class="col-md-6 col-lg-4 task-card mb-4">
+                <div class="card h-100 shadow-sm border-0 hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ task.title }}</h5>
+                        <p class="card-text">{{ task.description }}</p>
+                        <div class="text-muted small mb-3">
+                            <i class="fas fa-clock me-1"></i> Created: {{ task.created_date|date:"M d, Y H:i" }}
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-auto">
+                            <button class="btn btn-sm btn-outline-primary edit-task" data-id="{{ task.id }}"
+                                    data-bs-toggle="modal" data-bs-target="#editTaskModal">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-task" data-id="{{ task.id }}">
+                                <i class="fas fa-trash me-1"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info shadow-sm border-0">
-                <i class="fas fa-info-circle me-2"></i>No tasks found. Create your first task by clicking the "Add New Task" button.
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info shadow-sm border-0">
+                    <i class="fas fa-info-circle me-2"></i>No tasks found. Create your first task by clicking the "Add New Task" button.
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 
@@ -143,163 +154,315 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <style>
+/* Custom styles for the search bar and filters */
+.search-bar {
+    background-color: #f8f9ff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+
+.input-group-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Date input styling */
+input[type="date"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Task card enhancements */
 .hover-shadow:hover {
     transform: translateY(-4px);
     transition: transform 0.3s ease;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
+
 .card {
     transition: all 0.3s ease;
     border-radius: 0.5rem;
+    opacity: 1 !important; /* Override the opacity setting from base template */
 }
+
 .btn {
     border-radius: 0.25rem;
 }
+
 .form-control, .form-select {
     border-radius: 0.25rem;
 }
+
 .form-control:focus, .form-select:focus {
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Loading animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fix for Safari date input appearance */
+input::-webkit-date-and-time-value {
+    text-align: left;
+}
+
+/* Loading indicator */
+#loading-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--primary-color);
+    z-index: 9999;
+    transition: opacity 0.3s;
+}
+
+#loading-indicator.active {
+    opacity: 1;
+    animation: loading 1.5s infinite ease-in-out;
+}
+
+@keyframes loading {
+    0% { width: 0; left: 0; }
+    50% { width: 50%; left: 25%; }
+    100% { width: 0; left: 100%; }
+}
+
+/* Task card transitions */
+.task-card {
+    transition: all 0.3s ease;
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Loading spinner for taskList */
+.task-list-loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.task-list-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.task-list-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--primary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 11;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* No results message */
+.no-results {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+/* Filter badge styles */
+.filter-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.filter-badge i {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.filter-badge i:hover {
+    color: #dc3545;
 }
 </style>
 
 <script>
-// Use a variable to track if the form has been initialized
-var formInitialized = false;
-
+// Override base template's animation effects to prevent page content from disappearing
 $(document).ready(function() {
-    // Prevent double initialization
-    if (formInitialized) {
-        console.log("Form already initialized, skipping");
-        return;
-    }
+    // Make sure all elements are visible
+    $('.card, .btn, .form-control').css('opacity', '1');
     
-    formInitialized = true;
+    // Get CSRF token for AJAX requests
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    let isSubmitting = false;  // Flag to prevent double submission
-    let submissionCount = 0;   // Debug counter
-    let debounceTimer;         // For search debouncing
     
-    console.log("Task form initialized");
-
-    // Remove any existing event handlers from previous initializations
-    $('#addTaskForm').off('submit');
-    $('#saveTask').off('click');
-    
-    // Prevent any form submission
-    $('#addTaskForm').on('submit', function(e) {
-        console.log("Form submission prevented");
-        e.preventDefault();
-        e.stopPropagation();  // Stop event propagation
-        return false;
+    // Set up CSRF for AJAX requests
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
     });
-
-    // Initialize search functionality with debounce
-    function debounce(func, delay) {
-        return function() {
-            const context = this;
-            const args = arguments;
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => func.apply(context, args), delay);
-        };
-    }
-
-    // Apply filters using AJAX instead of page refresh
-    function applyFilters() {
-        // Show loading indicator
-        $('#loading-indicator').addClass('active');
+    
+    // Initialize the task list with any existing URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.toString()) {
+        fetchTasks(urlParams);
         
-        const searchValue = $('#searchInput').val().trim();
+        // Set the form values based on URL parameters
+        $('#searchInput').val(urlParams.get('search') || '');
+        $('#searchDate').val(urlParams.get('search_date') || '');
+        $('#sortByDate').val(urlParams.get('sort_by_date') || '');
+    } else {
+        // Initialize task events for the initial task list
+        initializeTaskEvents();
+    }
+    
+    // Handle Apply Filters button click
+    $('#applyFilters').on('click', function() {
+        applyFilters();
+    });
+    
+    // Handle Clear Filters button click
+    $('#clearFilters').on('click', function() {
+        clearFilters();
+    });
+    
+    // Also submit form when pressing Enter in inputs
+    $('#searchForm input, #searchForm select').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            applyFilters();
+        }
+    });
+    
+    // Function to apply filters
+    function applyFilters() {
+        const search = $('#searchInput').val().trim();
         const searchDate = $('#searchDate').val();
         const sortByDate = $('#sortByDate').val();
         
-        // Build query string for history
-        const searchParams = new URLSearchParams();
-        if (searchValue) searchParams.set('search', searchValue);
-        if (searchDate) searchParams.set('search_date', searchDate);
-        if (sortByDate) searchParams.set('sort_by_date', sortByDate);
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        if (searchDate) params.set('search_date', searchDate);
+        if (sortByDate) params.set('sort_by_date', sortByDate);
         
-        // Update URL without refresh
-        const newUrl = window.location.pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
-        history.pushState({ url: newUrl }, '', newUrl);
+        // Update the URL to reflect the filters
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.pushState({}, '', newUrl);
         
-        // Fetch filtered tasks via AJAX
+        // Fetch filtered tasks
+        fetchTasks(params);
+    }
+    
+    // Function to clear filters
+    function clearFilters() {
+        // Clear form inputs
+        $('#searchInput').val('');
+        $('#searchDate').val('');
+        $('#sortByDate').val('');
+        
+        // Update URL
+        window.history.pushState({}, '', window.location.pathname);
+        
+        // Fetch all tasks
+        fetchTasks(new URLSearchParams());
+    }
+    
+    // Function to fetch tasks via AJAX
+    function fetchTasks(params) {
+        // Show loading state
+        $('#taskListContainer').addClass('task-list-loading');
+        
         $.ajax({
-            url: '/api/tasks/',
-            data: {
-                search: searchValue,
-                search_date: searchDate,
-                sort_by_date: sortByDate
-            },
+            url: '/api/tasks/?' + params.toString(),
             type: 'GET',
-            success: function(data) {
-                updateTaskList(data);
+            success: function(tasks) {
+                renderTaskList(tasks);
+                
+                // Update browser URL to match the filters
+                if (params.toString()) {
+                    // Show active filters
+                    showActiveFilters(params);
+                }
             },
             error: function(xhr, status, error) {
-                console.error('Error fetching tasks:', error);
-                $('#taskList').html(
-                    `<div class="col-12">
+                console.error('Error fetching tasks:', xhr.responseText);
+                $('#taskList').html(`
+                    <div class="col-12">
                         <div class="alert alert-danger shadow-sm border-0">
-                            <i class="fas fa-exclamation-circle me-2"></i>Error loading tasks. Please try again.
+                            <i class="fas fa-exclamation-circle me-2"></i>Error loading tasks: ${error}
                         </div>
-                    </div>`
-                );
+                    </div>
+                `);
             },
             complete: function() {
-                $('#loading-indicator').removeClass('active');
+                // Hide loading state
+                $('#taskListContainer').removeClass('task-list-loading');
             }
         });
     }
     
-    // Update task list with fetched data
-    function updateTaskList(data) {
-        if (!data || !data.length) {
-            // No tasks found
-            $('#taskList').html(
-                `<div class="col-12">
+    // Function to render task list
+    function renderTaskList(tasks) {
+        if (!tasks || tasks.length === 0) {
+            $('#taskList').html(`
+                <div class="col-12">
                     <div class="alert alert-info shadow-sm border-0">
-                        <i class="fas fa-info-circle me-2"></i>No tasks found matching your criteria.
+                        <i class="fas fa-info-circle me-2"></i>No tasks found. Create your first task by clicking the "Add New Task" button.
                     </div>
-                </div>`
-            );
+                </div>
+            `);
             return;
         }
         
-        // Clear current tasks with fade out
-        $('#taskList').css('opacity', 0);
+        let taskListHtml = '';
         
-        // Build new task HTML
-        let taskHtml = '';
-        data.forEach(function(task) {
-            const createdDate = new Date(task.created_date).toLocaleString('en-US', {
-                month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'
-            });
-            
-            taskHtml += `
+        tasks.forEach(function(task) {
+            taskListHtml += `
                 <div class="col-md-6 col-lg-4 task-card mb-4">
                     <div class="card h-100 shadow-sm border-0 hover-shadow">
                         <div class="card-body">
-                            <h5 class="card-title text-truncate">${task.title}</h5>
-                            <p class="card-text">${task.description}</p>
+                            <h5 class="card-title text-truncate">${escapeHtml(task.title)}</h5>
+                            <p class="card-text">${escapeHtml(task.description)}</p>
                             <div class="text-muted small mb-3">
-                                <i class="fas fa-clock me-1"></i> Created: ${createdDate}
+                                <i class="fas fa-clock me-1"></i> Created: ${formatDate(task.created_date)}
                             </div>
                             <div class="d-flex justify-content-end gap-2 mt-auto">
-                                <button class="btn btn-sm btn-outline-primary edit-task" 
-                                        data-id="${task.id}" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#editTaskModal"
-                                        data-bs-toggle="tooltip" 
-                                        title="Edit this task">
+                                <button class="btn btn-sm btn-outline-primary edit-task" data-id="${task.id}"
+                                        data-bs-toggle="modal" data-bs-target="#editTaskModal">
                                     <i class="fas fa-edit me-1"></i> Edit
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger delete-task" 
-                                        data-id="${task.id}"
-                                        data-bs-toggle="tooltip" 
-                                        title="Delete this task">
+                                <button class="btn btn-sm btn-outline-danger delete-task" data-id="${task.id}">
                                     <i class="fas fa-trash me-1"></i> Delete
                                 </button>
                             </div>
@@ -309,27 +472,58 @@ $(document).ready(function() {
             `;
         });
         
-        // Update DOM and fade in
-        $('#taskList').html(taskHtml);
+        $('#taskList').html(taskListHtml);
         
-        // Reinitialize event handlers
+        // Re-initialize event handlers for the new task elements
         initializeTaskEvents();
-        
-        // Fade in with staggered animation
-        $('#taskList').css('opacity', 1);
-        $('.task-card').each(function(index) {
-            $(this).addClass('fade-in');
-            $(this).css('animation-delay', (index * 0.1) + 's');
-        });
-        
-        // Reinitialize tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl, {
-                delay: { show: 500, hide: 100 }
-            });
-        });
     }
+    
+    // Function to show active filters
+    function showActiveFilters(params) {
+        const search = params.get('search');
+        const searchDate = params.get('search_date');
+        const sortByDate = params.get('sort_by_date');
+        
+        let filtersHtml = '';
+        
+        if (search) {
+            filtersHtml += `<span class="filter-badge" data-filter="search">Search: "${search}" <i class="fas fa-times" onclick="removeFilter('search')"></i></span>`;
+        }
+        
+        if (searchDate) {
+            const date = new Date(searchDate);
+            const formattedDate = date.toLocaleDateString();
+            filtersHtml += `<span class="filter-badge" data-filter="search_date">Date: ${formattedDate} <i class="fas fa-times" onclick="removeFilter('search_date')"></i></span>`;
+        }
+        
+        if (sortByDate) {
+            const sortLabel = sortByDate === 'true' ? 'Newest First' : 'Oldest First';
+            filtersHtml += `<span class="filter-badge" data-filter="sort_by_date">Sort: ${sortLabel} <i class="fas fa-times" onclick="removeFilter('sort_by_date')"></i></span>`;
+        }
+    }
+    
+    // Helper function to format date
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Make removeFilter function available globally
+    window.removeFilter = function(filterName) {
+        const params = new URLSearchParams(window.location.search);
+        params.delete(filterName);
+        
+        // Update form inputs
+        if (filterName === 'search') $('#searchInput').val('');
+        if (filterName === 'search_date') $('#searchDate').val('');
+        if (filterName === 'sort_by_date') $('#sortByDate').val('');
+        
+        // Update URL and fetch tasks
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.pushState({}, '', newUrl);
+        fetchTasks(params);
+    };
     
     // Initialize event handlers for dynamically created task elements
     function initializeTaskEvents() {
@@ -351,11 +545,11 @@ $(document).ready(function() {
                             <input type="hidden" id="editTaskId" value="${task.id}">
                             <div class="mb-3">
                                 <label for="editTitle" class="form-label">Title</label>
-                                <input type="text" class="form-control" id="editTitle" name="title" value="${task.title}" required>
+                                <input type="text" class="form-control" id="editTitle" name="title" value="${escapeHtml(task.title)}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="editDescription" class="form-label">Description</label>
-                                <textarea class="form-control" id="editDescription" name="description" rows="3" required>${task.description}</textarea>
+                                <textarea class="form-control" id="editDescription" name="description" rows="3" required>${escapeHtml(task.description)}</textarea>
                             </div>
                         </form>
                     `;
@@ -378,8 +572,6 @@ $(document).ready(function() {
         // Delete Task
         $('.delete-task').off('click').on('click', function() {
             if (confirm('Are you sure you want to delete this task?')) {
-                if (isSubmitting) return;  // Prevent double submission
-                isSubmitting = true;
                 const $button = $(this);
                 $button.prop('disabled', true);
                 $button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
@@ -413,86 +605,39 @@ $(document).ready(function() {
                         $button.html('<i class="fas fa-trash me-1"></i> Delete');
                     },
                     complete: function() {
-                        isSubmitting = false;
                         $button.prop('disabled', false);
                     }
                 });
             }
         });
     }
-
-    // Handle real-time search
-    $('#searchInput').on('input', debounce(function() {
-        applyFilters();
-    }, 500));
-
-    // Handle date selection
-    $('#searchDate').on('change', function() {
-        applyFilters();
-    });
-
-    // Handle sort selection
-    $('#sortByDate').on('change', function() {
-        applyFilters();
-    });
-
-    // Clear all filters
-    $('#clearFilters').on('click', function() {
-        $('#searchInput').val('');
-        $('#searchDate').val('');
-        $('#sortByDate').val('');
-        applyFilters();
-    });
-
-    // Initialize filters from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    $('#searchInput').val(urlParams.get('search') || '');
-    $('#searchDate').val(urlParams.get('search_date') || '');
-    $('#sortByDate').val(urlParams.get('sort_by_date') || '');
     
-    // If we have filter parameters, load content immediately
-    if (urlParams.toString()) {
-        applyFilters();
+    // Helper function to escape HTML entities
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
-    
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-        new bootstrap.Tooltip(tooltipTriggerEl, {
-            delay: { show: 500, hide: 100 }
-        });
-    });
-    
-    // Initial setup for task events
-    initializeTaskEvents();
 
     // Add Task
     $('#saveTask').on('click', function(e) {
-        console.log("Save button clicked");
-        e.preventDefault();  // Prevent default action
-        e.stopPropagation(); // Stop event propagation
-        
-        if (isSubmitting) {
-            console.log("Already submitting, preventing duplicate");
-            return false;
-        }
+        e.preventDefault();
         
         const title = $('#title').val().trim();
         const description = $('#description').val().trim();
         
         if (!title || !description) {
-            // Show validation error with animation
+            // Show validation error
             const $errorMsg = $('<div class="alert alert-danger mt-3 fade-in">Please fill in all required fields</div>');
             $('#addTaskForm').append($errorMsg);
             setTimeout(() => $errorMsg.fadeOut(500, function() { $(this).remove(); }), 3000);
             return false;
         }
 
-        isSubmitting = true;
-        submissionCount++;
-        const currentSubmission = submissionCount;
-        console.log(`Starting submission #${currentSubmission}`);
-        
         // Show loading indicator in the button
         const $button = $(this);
         $button.prop('disabled', true)
@@ -503,31 +648,23 @@ $(document).ready(function() {
             description: description
         };
 
-        // Disable all buttons and form fields during submission
-        $('.modal-content button').prop('disabled', true);
+        // Disable form fields during submission
         $('#title, #description').prop('disabled', true);
 
-        // Use a unique ID for each request based on timestamp to ensure no duplicates
-        const uniqueId = new Date().getTime() + '-' + Math.random().toString(36).substr(2, 9);
-        
         // Show the loading indicator
         $('#loading-indicator').addClass('active');
         
         $.ajax({
-            url: '/api/tasks/?_=' + uniqueId + '&submission=' + currentSubmission,
+            url: '/api/tasks/',
             type: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-Submission-ID': currentSubmission.toString(),
-                'X-Request-ID': uniqueId
+                'Content-Type': 'application/json'
             },
             data: JSON.stringify(formData),
             processData: false,
             success: function(response) {
-                console.log(`Submission #${currentSubmission} successful`);
-                
                 // Hide the modal
                 const modal = bootstrap.Modal.getInstance($('#addTaskModal'));
                 modal.hide();
@@ -535,42 +672,11 @@ $(document).ready(function() {
                 // Reset the form
                 $('#addTaskForm')[0].reset();
                 
-                // Add the new task to the UI with animation
-                const taskCard = createTaskCard(response);
-                
-                if ($('#taskList .alert').length > 0) {
-                    // Replace "no tasks" message with the new task
-                    $('#taskList').html(taskCard);
-                } else {
-                    // Prepend the new task to the list
-                    $('#taskList').prepend(taskCard);
-                }
-                
-                // Apply animations and initialize event handlers
-                const $newCard = $('#taskList .task-card').first();
-                $newCard.hide().fadeIn(500);
-                initializeTaskEvents();
-                
-                // Show success message
-                showToast('Task created successfully!', 'success');
+                // Refresh the task list with current filters
+                fetchTasks(new URLSearchParams(window.location.search));
             },
             error: function(xhr, status, error) {
-                console.error(`Submission #${currentSubmission} failed:`, {xhr, status, error});
-                
-                // If it's a 429 error (too many requests), it means a duplicate was prevented
-                if (xhr.status === 429) {
-                    console.log("Duplicate submission detected, refreshing task list");
-                    applyFilters(); // Refresh the task list
-                    
-                    // Hide the modal
-                    const modal = bootstrap.Modal.getInstance($('#addTaskModal'));
-                    modal.hide();
-                    
-                    // Reset the form
-                    $('#addTaskForm')[0].reset();
-                    
-                    return;
-                }
+                console.error('Error creating task:', {xhr, status, error});
                 
                 let errorMessage = 'Error creating task';
                 try {
@@ -586,15 +692,11 @@ $(document).ready(function() {
                 setTimeout(() => $errorMsg.fadeOut(500, function() { $(this).remove(); }), 4000);
             },
             complete: function() {
-                console.log(`Submission #${currentSubmission} completed`);
-                isSubmitting = false;
-                
                 // Reset the button
                 $button.prop('disabled', false)
                        .html('<i class="fas fa-save me-1"></i> Save Task');
                 
-                // Re-enable all buttons and form fields
-                $('.modal-content button').prop('disabled', false);
+                // Re-enable form fields
                 $('#title, #description').prop('disabled', false);
                 
                 // Hide the loading indicator
@@ -602,52 +704,11 @@ $(document).ready(function() {
             }
         });
         
-        return false; // Prevent any default action or bubbling
+        return false;
     });
-    
-    // Function to create a task card HTML
-    function createTaskCard(task) {
-        const createdDate = new Date(task.created_date).toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'
-        });
-        
-        return `
-            <div class="col-md-6 col-lg-4 task-card mb-4">
-                <div class="card h-100 shadow-sm border-0 hover-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title text-truncate">${task.title}</h5>
-                        <p class="card-text">${task.description}</p>
-                        <div class="text-muted small mb-3">
-                            <i class="fas fa-clock me-1"></i> Created: ${createdDate}
-                        </div>
-                        <div class="d-flex justify-content-end gap-2 mt-auto">
-                            <button class="btn btn-sm btn-outline-primary edit-task" 
-                                    data-id="${task.id}" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#editTaskModal"
-                                    data-bs-toggle="tooltip" 
-                                    title="Edit this task">
-                                <i class="fas fa-edit me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-task" 
-                                    data-id="${task.id}"
-                                    data-bs-toggle="tooltip" 
-                                    title="Delete this task">
-                                <i class="fas fa-trash me-1"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
     
     // Update Task handler
     $('#updateTask').on('click', function() {
-        if (isSubmitting) return;
-        isSubmitting = true;
-        
-        // Add loading spinner to button
         const $button = $(this);
         $button.prop('disabled', true)
                .html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...');
@@ -676,22 +737,8 @@ $(document).ready(function() {
                 const modal = bootstrap.Modal.getInstance($('#editTaskModal'));
                 modal.hide();
                 
-                // Update the task in the UI
-                const $taskCard = $(`.task-card .edit-task[data-id="${taskId}"]`).closest('.task-card');
-                const createdDate = new Date(response.created_date).toLocaleString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'
-                });
-                
-                // Update card with highlight animation
-                $taskCard.find('.card-title').text(response.title);
-                $taskCard.find('.card-text').text(response.description);
-                
-                // Highlight the updated card
-                $taskCard.find('.card').addClass('border-primary');
-                setTimeout(() => $taskCard.find('.card').removeClass('border-primary'), 2000);
-                
-                // Show success message
-                showToast('Task updated successfully!', 'success');
+                // Refresh the task list with current filters
+                fetchTasks(new URLSearchParams(window.location.search));
             },
             error: function(xhr, status, error) {
                 console.error('Error details:', {xhr, status, error});
@@ -710,8 +757,6 @@ $(document).ready(function() {
                 setTimeout(() => $errorMsg.fadeOut(500, function() { $(this).remove(); }), 4000);
             },
             complete: function() {
-                isSubmitting = false;
-                
                 // Reset the button
                 $button.prop('disabled', false)
                        .html('<i class="fas fa-save me-1"></i> Update Task');
@@ -722,36 +767,20 @@ $(document).ready(function() {
         });
     });
     
-    // Toast notification function
-    function showToast(message, type = 'info') {
-        // Create toast container if it doesn't exist
-        if ($('#toast-container').length === 0) {
-            $('body').append('<div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>');
-        }
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        // Get the current URL parameters
+        const params = new URLSearchParams(window.location.search);
         
-        // Create toast element
-        const toastId = 'toast-' + Date.now();
-        const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        `;
+        // Update form fields
+        $('#searchInput').val(params.get('search') || '');
+        $('#searchDate').val(params.get('search_date') || '');
+        $('#sortByDate').val(params.get('sort_by_date') || '');
         
-        // Add toast to container
-        $('#toast-container').append(toastHtml);
-        
-        // Initialize and show the toast
-        const toastElement = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
-        toast.show();
-    }
+        // Fetch tasks with these parameters
+        fetchTasks(params);
+    });
 });
 </script>
 {% endblock %}
-{% endblock %}
+

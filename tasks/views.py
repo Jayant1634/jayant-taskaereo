@@ -14,6 +14,8 @@ from django.core.cache import cache
 import hashlib
 import json
 import time
+from datetime import datetime
+from rest_framework.pagination import PageNumberPagination
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -29,6 +31,44 @@ class TaskViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'created_date': ['exact', 'gte', 'lte']
     }
+
+    def get_paginated_response(self, data):
+        # Check if any filter is applied
+        has_filters = any([
+            self.request.query_params.get('search', None),
+            self.request.query_params.get('search_date', None),
+            self.request.query_params.get('sort_by_date', None)
+        ])
+        
+        # If filters applied, return non-paginated response directly
+        if has_filters:
+            return Response(data)
+        
+        # Otherwise, use standard pagination
+        return super().get_paginated_response(data)
+        
+    def list(self, request, *args, **kwargs):
+        # Check if any filter is applied
+        has_filters = any([
+            request.query_params.get('search', None),
+            request.query_params.get('search_date', None),
+            request.query_params.get('sort_by_date', None)
+        ])
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        if has_filters:
+            # Skip pagination for filtered requests
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            # Use pagination for unfiltered requests
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         try:
@@ -122,13 +162,28 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = Task.objects.all()
         sort_by_date = self.request.query_params.get('sort_by_date', None)
         search_date = self.request.query_params.get('search_date', None)
+        search = self.request.query_params.get('search', None)
         
+        if search:
+            queryset = queryset.filter(title__icontains=search)
+            
         if sort_by_date == 'true':
             queryset = queryset.order_by('-created_date')
         elif sort_by_date == 'false':
             queryset = queryset.order_by('created_date')
+            
         if search_date:
-            queryset = queryset.filter(created_date__date=search_date)
+            try:
+                # For HTML date input, we should already have ISO format (YYYY-MM-DD)
+                logger.info(f"Filtering by date: {search_date}")
+                
+                # Filter tasks by the date
+                queryset = queryset.filter(created_date__date=search_date)
+                logger.info(f"Filtered queryset count: {queryset.count()}")
+            except Exception as e:
+                logger.error(f"Error filtering by date: {str(e)}, date: {search_date}")
+                # If filtering fails, don't apply the filter
+                pass
             
         return queryset
 
@@ -146,8 +201,20 @@ class TaskListView(ListView):
 
         if search:
             queryset = queryset.filter(title__icontains=search)
+            
         if search_date:
-            queryset = queryset.filter(created_date__date=search_date)
+            try:
+                # For HTML date input, we should already have ISO format (YYYY-MM-DD)
+                logger.info(f"TaskListView filtering by date: {search_date}")
+                
+                # Filter tasks by the date
+                queryset = queryset.filter(created_date__date=search_date)
+                logger.info(f"Filtered queryset count: {queryset.count()}")
+            except Exception as e:
+                logger.error(f"Error in TaskListView filtering by date: {str(e)}, date: {search_date}")
+                # If filtering fails, don't apply the filter
+                pass
+                
         if sort_by_date == 'true':
             queryset = queryset.order_by('-created_date')
         elif sort_by_date == 'false':

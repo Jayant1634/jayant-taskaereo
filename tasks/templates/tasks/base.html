@@ -10,6 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- jQuery UI for datepicker -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -378,6 +381,32 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: #a1a1a1;
+        }
+        
+        /* Fix for datepicker z-index */
+        .ui-datepicker {
+            z-index: 9999 !important;
+        }
+        
+        /* Ensure form controls are clickable */
+        .form-control, .form-select, .input-group-text {
+            position: relative;
+            z-index: 5;
+        }
+        
+        /* Make sure datepicker appears above other elements */
+        .ui-datepicker-trigger {
+            z-index: 6;
+        }
+        
+        /* Fix for input group styling */
+        .input-group {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .input-group:focus-within {
+            z-index: 3;
         }
     </style>
 </head>
